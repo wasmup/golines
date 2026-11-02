@@ -25,7 +25,7 @@ Built entirely with the **Go standard library**, with no external dependencies.
 
 ### Requirements
 
-- Go installed on your system.
+- Go 1.27.3 or later.
 - Compatible with Linux, macOS, and Windows.
 
 ### Build from source
@@ -232,7 +232,7 @@ The tool uses:
 
 - `filepath.WalkDir` for recursive directory traversal.
 - `bufio.Reader` for buffered file reading.
-- `strings.TrimSpace` for whitespace detection.
+- `unicode.IsSpace` for whitespace detection.
 - `sort.Slice` for ordering results.
 - `flag` for command-line argument parsing.
 
@@ -248,6 +248,7 @@ Memory usage is primarily determined by the buffered reader and the number of fi
 - Hidden directories are always skipped, except when the hidden directory itself is selected as the root.
 - `-x` must appear last.
 - Symbolic links to directories are not followed.
+- Symbolic links and other non-regular files are not counted.
 - File reading and traversal errors terminate execution.
 
 ## License

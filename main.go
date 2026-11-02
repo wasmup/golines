@@ -11,6 +11,7 @@ import (
 	"path/filepath"
 	"sort"
 	"strings"
+	"unicode"
 )
 
 type fileStat struct {
@@ -93,6 +94,13 @@ func main() {
 		if !strings.HasSuffix(name, ".go") {
 			return nil
 		}
+		info, err := d.Info()
+		if err != nil {
+			return err
+		}
+		if !info.Mode().IsRegular() {
+			return nil
+		}
 		if !*includeTests && strings.HasSuffix(name, "_test.go") {
 			return nil
 		}
@@ -138,22 +146,30 @@ func countLines(path string, skipEmpty bool) (int, error) {
 
 	reader := bufio.NewReader(f)
 	lines := 0
+	hasData := false
+	hasNonSpace := false
 
 	for {
-		line, err := reader.ReadString('\n')
-
-		if len(line) > 0 {
-			if !skipEmpty || strings.TrimSpace(line) != "" {
-				lines++
-			}
-		}
-
+		r, _, err := reader.ReadRune()
 		if err != nil {
 			if errors.Is(err, io.EOF) {
 				break
 			}
 			return 0, err
 		}
+		hasData = true
+		if !unicode.IsSpace(r) {
+			hasNonSpace = true
+		}
+		if r == '\n' {
+			if !skipEmpty || hasNonSpace {
+				lines++
+			}
+			hasData, hasNonSpace = false, false
+		}
+	}
+	if hasData && (!skipEmpty || hasNonSpace) {
+		lines++
 	}
 
 	return lines, nil
