@@ -46,7 +46,7 @@ go build -o golines .
 Optionally install it into your Go binary directory:
 
 ```bash
-go install .
+go install
 
 # or
 go install -trimpath -ldflags=-s
